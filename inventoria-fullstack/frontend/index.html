@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Inventory Management</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="p-6">
+  
+  <!-- Custom Message Box Modal -->
+  <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all scale-100">
+        <h3 id="messageTitle" class="text-xl font-bold mb-3"></h3>
+        <p id="messageContent" class="text-gray-600 mb-6 whitespace-pre-line"></p>
+        <button class="btn w-full" onclick="closeMessageBox()">OK</button>
+    </div>
+  </div>
+
+  <!-- Main Page -->
+  <div id="mainPage" class="space-y-8">
+    
+    <!-- Header with User Info -->
+    <div class="flex flex-col lg:flex-row items-center justify-between mb-8">
+      <h1 class="text-4xl font-extrabold text-indigo-800 mb-4 lg:mb-0">Personal Inventory Management</h1>
+      <div class="flex items-center gap-4">
+        <span class="text-gray-700">Welcome, <strong id="usernameDisplay"></strong></span>
+        <button onclick="logout()" class="btn bg-red-500 hover:bg-red-600">Logout</button>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search items..." 
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-full lg:w-64"
+      />
+      <div class="flex flex-wrap justify-center gap-2">
+        <button class="filter-btn bg-indigo-500 text-white shadow-md" data-filter="default">All Items</button>
+        <button class="filter-btn bg-yellow-400 text-yellow-900 shadow-md" data-filter="low">Low Stock</button>
+        <button class="filter-btn bg-red-500 text-white shadow-md" data-filter="out">Out of Stock</button>
+      </div>
+    </div>
+
+    <!-- Inventory Cards Container -->
+    <div id="inventoryList" class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Item cards will be rendered here by JavaScript -->
+      <div class="col-span-full text-center py-12">
+        <p class="text-gray-500 text-lg">Loading inventory...</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center space-x-4 pt-4">
+      <button class="btn bg-green-500 hover:bg-green-600" onclick="showAddItemPage()">Add New Item</button>
+    </div>
+  </div>
+
+  <!-- Stock Up Page -->
+  <div id="stockUpPage" class="hidden space-y-6 max-w-md mx-auto card">
+    <h2 class="text-2xl font-bold text-indigo-700 text-center">Stock Up Inventory</h2>
+
+    <div>
+      <label class="block font-medium mb-1">Select Item:</label>
+      <select id="itemSelect" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500">
+        <!-- Options populated by JS -->
+      </select>
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Add Quantity:</label>
+      <input id="stockUpInput" type="number" min="1" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" value="0" />
+    </div>
+
+    <div class="flex justify-end space-x-4 pt-2">
+      <button class="btn bg-gray-500 hover:bg-gray-600" onclick="goBack()">Cancel</button>
+      <button class="btn" onclick="updateStock()">Done</button>
+    </div>
+  </div>
+
+  <!-- Add Item Page -->
+  <div id="addItemPage" class="hidden space-y-6 max-w-md mx-auto card">
+    <h2 class="text-2xl font-bold text-indigo-700 text-center">Add New Inventory Item</h2>
+
+    <div>
+      <label for="newItemName" class="block font-medium mb-1">Item Name:</label>
+      <input id="newItemName" type="text" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Sugar" required />
+    </div>
+
+    <div>
+      <label for="newItemBalance" class="block font-medium mb-1">Initial Balance:</label>
+      <input id="newItemBalance" type="number" min="0" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" value="0" />
+    </div>
+
+    <div>
+      <label for="newItemMinStock" class="block font-medium mb-1">Minimum Stock Alert Amount:</label>
+      <input id="newItemMinStock" type="number" min="1" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" value="10" required />
+      <p class="text-xs text-gray-500 mt-1">Item balance will turn yellow when it reaches this amount or lower.</p>
+    </div>
+
+    <div>
+      <label for="newItemImage" class="block font-medium mb-1">Item Image (Optional):</label>
+      <input id="newItemImage" type="file" accept="image/*" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" />
+    </div>
+
+    <div class="flex justify-end space-x-4 pt-2">
+      <button class="btn bg-gray-500 hover:bg-gray-600" onclick="goBack()">Cancel</button>
+      <button class="btn bg-green-500 hover:bg-green-600" onclick="addNewItem()">Add Item</button>
+    </div>
+  </div>
+
+  <!-- Edit Item Page -->
+  <div id="editItemPage" class="hidden space-y-6 max-w-md mx-auto card">
+    <h2 class="text-2xl font-bold text-indigo-700 text-center">Edit Inventory Item</h2>
+
+    <input type="hidden" id="editItemId" />
+
+    <div>
+      <label for="editItemName" class="block font-medium mb-1">Item Name:</label>
+      <input id="editItemName" type="text" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" required />
+    </div>
+
+    <div>
+      <label for="editItemBalance" class="block font-medium mb-1">Current Balance:</label>
+      <input id="editItemBalance" type="number" min="0" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" />
+    </div>
+
+    <div>
+      <label for="editItemMinStock" class="block font-medium mb-1">Minimum Stock Alert:</label>
+      <input id="editItemMinStock" type="number" min="1" class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-indigo-500 focus:border-indigo-500" required />
+    </div>
+
+    <div class="flex justify-end space-x-4 pt-2">
+      <button class="btn bg-gray-500 hover:bg-gray-600" onclick="goBack()">Cancel</button>
+      <button class="btn bg-blue-500 hover:bg-blue-600" onclick="updateExistingItem()">Update</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
