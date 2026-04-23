@@ -1,0 +1,81 @@
+body {
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #333;
+    min-height: 100vh;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
+    border: 2px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.btn {
+    background-color: #4f46e5;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: 0.3s;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+    background-color: #4338ca;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.filter-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: 0.2s;
+    opacity: 0.8;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+}
+
+.filter-btn:hover {
+    opacity: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Smooth transitions */
+* {
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
